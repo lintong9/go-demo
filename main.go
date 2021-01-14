@@ -10,7 +10,7 @@ import (
 	"github.com/malisit/kolpa"
 )
 
-func init()  {
+func init() {
 	_ = initDB()
 }
 func main() {
@@ -46,6 +46,7 @@ func insertDb(k kolpa.Generator, wg *sync.WaitGroup) {
 	for {
 		sqlStr := "INSERT INTO user (name, password, nickname, avator) VALUES (?, ?, ?,?)"
 		stmt, _ := DB.Prepare(sqlStr)
+		start := time.Now()
 		for i := 0; i < 500; i++ {
 			_, err := stmt.Exec(k.Name(), k.PaymentCard(), k.LastName(), k.Address())
 			if err != nil {
@@ -53,7 +54,11 @@ func insertDb(k kolpa.Generator, wg *sync.WaitGroup) {
 				return
 			}
 		}
+		end := time.Now()
 		fmt.Println("插入完成")
 		fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
+		fmt.Println(end.Sub(start))
+		time.Sleep(time.Microsecond)
+
 	}
 }
