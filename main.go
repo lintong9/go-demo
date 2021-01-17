@@ -8,12 +8,15 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/malisit/kolpa"
+	uuid "github.com/satori/go.uuid"
 )
 
 func init() {
 	_ = initDB()
 }
 func main() {
+	// ctx := context.WithValue(context.Background(),"test","test")
+	// Redis.String(ctx)
 	k := kolpa.C()
 	wg := sync.WaitGroup{}
 	wg.Add(10)
@@ -43,22 +46,29 @@ func initDB() (err error) {
 }
 
 func insertDb(k kolpa.Generator, wg *sync.WaitGroup) {
+	// stmt, _ := DB.Prepare(sqlStr)
 	for {
-		sqlStr := "INSERT INTO user (name, password, nickname, avator) VALUES (?, ?, ?,?)"
-		stmt, _ := DB.Prepare(sqlStr)
-		start := time.Now()
+		sqlStr := "INSERT INTO go_uuid (uuid, created_time) VALUES"
 		for i := 0; i < 500; i++ {
-			_, err := stmt.Exec(k.Name(), k.PaymentCard(), k.LastName(), k.Address())
-			if err != nil {
-				fmt.Printf("exec failed, err:%v\n", err)
-				return
+			str, _ := uuid.NewV4()
+			insertTime := time.Now().Unix()
+			if i == 0 {
+				sqlStr += fmt.Sprintf("('%s', %d)", str, insertTime)
+			} else {
+				sqlStr += fmt.Sprintf(",('%s', %d)", str, insertTime)
 			}
 		}
-		end := time.Now()
+		_, err := DB.Exec(sqlStr)
+		if err != nil {
+			fmt.Printf("exec failed, err:%v\n", err)
+			return
+		}
 		fmt.Println("插入完成")
 		fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
-		fmt.Println(end.Sub(start))
 		time.Sleep(time.Microsecond)
-
 	}
+}
+
+func getRedis() {
+
 }
