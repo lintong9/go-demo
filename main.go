@@ -5,10 +5,10 @@ import (
 	"sync"
 	"time"
 
+	"demo/Snow"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/malisit/kolpa"
-	uuid "github.com/satori/go.uuid"
 )
 
 func init() {
@@ -28,6 +28,8 @@ func main() {
 	wg.Wait()
 	fmt.Println("finish")
 	return
+	// getSnowFlake()
+	// return
 }
 
 var DB *sqlx.DB
@@ -50,12 +52,12 @@ func insertDb(k kolpa.Generator, wg *sync.WaitGroup) {
 	for {
 		sqlStr := "INSERT INTO go_uuid (uuid, created_time) VALUES"
 		for i := 0; i < 500; i++ {
-			str, _ := uuid.NewV4()
+			str, _ := Snow.Snow.GetSnowflakeId()
 			insertTime := time.Now().Unix()
 			if i == 0 {
-				sqlStr += fmt.Sprintf("('%s', %d)", str, insertTime)
+				sqlStr += fmt.Sprintf("('%d', %d)", str, insertTime)
 			} else {
-				sqlStr += fmt.Sprintf(",('%s', %d)", str, insertTime)
+				sqlStr += fmt.Sprintf(",('%d', %d)", str, insertTime)
 			}
 		}
 		_, err := DB.Exec(sqlStr)
@@ -71,4 +73,15 @@ func insertDb(k kolpa.Generator, wg *sync.WaitGroup) {
 
 func getRedis() {
 
+}
+
+func getSnowFlake() {
+	var count int = 1000000
+	mapId := make(map[int64]int64, count)
+	fmt.Println("start,count:", count)
+	for i := 0; i < count; i++ {
+		id, ts := Snow.Snow.GetSnowflakeId()
+		mapId[id] = ts
+	}
+	fmt.Println("done,count:", count, ",mapCount:", len(mapId))
 }
