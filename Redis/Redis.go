@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 )
 
 var ClientRedis *redis.Client
@@ -12,8 +12,8 @@ var ClientRedis *redis.Client
 const (
 	REDIS_NETWORK  = "tcp"
 	REDIS_HOST     = "127.0.0.1"
-	REDIS_PORT     = "3306"
-	REDIS_PASSWORD = ""
+	REDIS_PORT     = "6379"
+	REDIS_PASSWORD = "lintong"
 	REDIS_DB       = 0
 )
 
@@ -38,7 +38,6 @@ func init() {
 		IdleTimeout:        0,
 		IdleCheckFrequency: 0,
 		TLSConfig:          nil,
-		Limiter:            nil,
 	}
 	// 新建一个client
 	ClientRedis = redis.NewClient(&options)
@@ -49,7 +48,10 @@ func init() {
 func String(ctx context.Context) {
 	// 添加string
 	defer ClientRedis.Close()
-	ClientRedis.Set(ctx, "golang", "12345", -1)
+	err := ClientRedis.Set(ctx, "golang", "12345", 0).Err()
+	if err != nil {
+		panic(err)
+	}
 }
 
 // func Hash() {

@@ -5,28 +5,31 @@ import (
 	"sync"
 	"time"
 
+	"demo/Excel"
 	"demo/Snow"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/malisit/kolpa"
+	// "demo/Excel"
 )
 
 func init() {
 	_ = initDB()
 }
 func main() {
+	Excel.GetTest()
 	// ctx := context.WithValue(context.Background(),"test","test")
 	// Redis.String(ctx)
-	k := kolpa.C()
-	wg := sync.WaitGroup{}
-	wg.Add(10)
-	for i := 0; i < 20; i++ {
-		go func() {
-			insertDb(k, &wg)
-		}()
-	}
-	wg.Wait()
-	fmt.Println("finish")
+	// k := kolpa.C()
+	// wg := sync.WaitGroup{}
+	// wg.Add(10)
+	// for i := 0; i < 20; i++ {
+	// 	go func() {
+	// 		insertDb(k, &wg)
+	// 	}()
+	// }
+	// wg.Wait()
+	// fmt.Println("finish")
 	return
 	// getSnowFlake()
 	// return
