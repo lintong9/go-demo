@@ -12,7 +12,7 @@ var ClientRedis *redis.Client
 const (
 	REDIS_NETWORK  = "tcp"
 	REDIS_HOST     = "127.0.0.1"
-	REDIS_PORT     = "6379"
+	REDIS_PORT     = "63790"
 	REDIS_PASSWORD = "lintong"
 	REDIS_DB       = 0
 )
@@ -54,6 +54,13 @@ func String(ctx context.Context) {
 	}
 }
 
+func Incr(ctx context.Context, key string) {
+	// defer ClientRedis.Close()
+	pipe := ClientRedis.TxPipeline()
+	_ = pipe.Incr(ctx, key)
+	_, _ = pipe.Exec(ctx)
+}
+
 // func Hash() {
 // 	// hash - 添加field
 // 	ClientRedis.HSet("golang_hash", "key_1", "val_1", "key_2", "val_2")
@@ -93,30 +100,37 @@ func String(ctx context.Context) {
 // 	ClientRedis.HDel("golang_hash", "key_1", "key_2", "key_3")
 // }
 //
-// func List() {
-// 	// list - 从左追加 index 0 val val_3,index 1 val val_2
-// 	ClientRedis.LPush("golang_list", "val_2", "val_3")
-// 	// list - 从左追加 index 0 val val_5,index 1 val val_4
-// 	ClientRedis.LPushX("golang_list", "val_4", "val_5")
-// 	// list - 从右追加 index -1 val val_10,index -2 val val_9
-// 	ClientRedis.RPush("golang_list", "val_9", "val_10")
-// 	// list - 通过index设置val
-// 	ClientRedis.LSet("golang_list", 0, "val_1")
-// 	// list - 通过index获取val
-// 	stringCmd := ClientRedis.LIndex("golang_list", 0)
-// 	fmt.Println(stringCmd.String(), stringCmd.Args(), stringCmd.Val())
-// 	// list - 获取长度
-// 	lenCmd := ClientRedis.LLen("golang_list")
-// 	fmt.Println(lenCmd.String(), lenCmd.Args(), lenCmd.Val())
-// 	// list - 从左删除
-// 	ClientRedis.LPop("golang_list")
-// 	// list - 取全部
-// 	listCmd := ClientRedis.LRange("golang_list", 0, -1)
-// 	fmt.Println(listCmd.String(), listCmd.Args(), listCmd.Val())
-// 	// list - 截取，当start为负数时从右向左截取
-// 	ltrimCmd := ClientRedis.LTrim("golang_list", 2, 3)
-// 	fmt.Println(ltrimCmd.String(), ltrimCmd.Args(), ltrimCmd.Val())
-// }
+func LPush(ctx context.Context, key string) {
+	// list - 从左追加 index 0 val val_3,index 1 val val_2
+	ClientRedis.LPush(ctx, key, 1)
+	// // list - 从左追加 index 0 val val_5,index 1 val val_4
+	// ClientRedis.LPushX(ctx, key, "val_5")
+	// // list - 从右追加 index -1 val val_10,index -2 val val_9
+	// ClientRedis.RPush(ctx, key, "val_10")
+	// // list - 通过index设置val
+	// ClientRedis.LSet(ctx, key, 0, "aaaa")
+	// // list - 通过index获取val
+	// stringCmd := ClientRedis.LIndex(ctx, key, 1)
+	// fmt.Println(stringCmd.String(), stringCmd.Args(), stringCmd.Val())
+	// list - 获取长度
+	lenCmd := ClientRedis.LLen(ctx, key)
+	fmt.Println(lenCmd.String(), lenCmd.Args(), lenCmd.Val())
+	// // list - 从左删除
+	// ClientRedis.LPop(ctx, key)
+	// // list - 取全部
+	// listCmd := ClientRedis.LRange(ctx, key, 0, -1)
+	// fmt.Println(listCmd.String(), listCmd.Args(), listCmd.Val())
+	// // list - 截取，当start为负数时从右向左截取
+	// ltrimCmd := ClientRedis.LTrim(ctx, key, 2, 3)
+	// fmt.Println(ltrimCmd.String(), ltrimCmd.Args(), ltrimCmd.Val())
+}
+
+func LPop(ctx context.Context, key string) *redis.StringCmd {
+	// // list - 从左删除
+	stringCmd := ClientRedis.LPop(ctx, key)
+	return stringCmd
+}
+
 //
 // func Set() {
 // 	// 无序集合 ("马超", "关羽", "赵云") 后面的赵云会覆盖前面的赵云

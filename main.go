@@ -1,11 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
 
-	"demo/Excel"
+	"demo/Redis"
 	"demo/Snow"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -14,22 +15,41 @@ import (
 )
 
 func init() {
-	_ = initDB()
+	// _ = initDB()
 }
 func main() {
-	Excel.GetTest()
-	// ctx := context.WithValue(context.Background(),"test","test")
+	// ShowMeBug.Do()
+	// Excel.GetTest()
+	ctx := context.WithValue(context.Background(), "test", "test")
 	// Redis.String(ctx)
 	// k := kolpa.C()
+	wg := sync.WaitGroup{}
+	wg.Add(10)
+	for i := 0; i < 10; i++ {
+		go func() {
+			defer Redis.ClientRedis.Close()
+			for j := 0; j < 10; j++ {
+				Redis.Incr(ctx, "key3")
+			}
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+	// for i := 0; i <20 ; i++ {
+	// 	Redis.LPush(ctx,"test")
+	// }
 	// wg := sync.WaitGroup{}
-	// wg.Add(10)
-	// for i := 0; i < 20; i++ {
+	// wg.Add(100)
+	// for i := 0; i < 100; i++ {
 	// 	go func() {
-	// 		insertDb(k, &wg)
+	// 		stringCmd :=Redis.LPop(ctx,"test")
+	// 		fmt.Println(stringCmd.Val())
+	// 		wg.Done()
 	// 	}()
 	// }
 	// wg.Wait()
-	// fmt.Println("finish")
+	Redis.ClientRedis.Close()
+	fmt.Println("finish")
 	return
 	// getSnowFlake()
 	// return
